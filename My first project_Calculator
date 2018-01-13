@@ -1,0 +1,240 @@
+#include <stdio.h>
+#include <stdlib.h >
+#include <conio.h>
+#include <stdlib.h>
+#include <Windows.h>
+#include <mmsystem.h>
+#include <string.h>
+#include <time.h>
+#pragma comment(lib,"WINMM.LIB")
+#define  X 68
+#define  Y 24
+
+
+static int Wrong_number=0;
+char map[Y][X]=
+{"■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■                                                              ■\n",
+"■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n"};
+
+int length=4;
+
+struct Snack
+ //定义蛇身结构体
+{
+	int x;
+	int y;
+	Snack* next;
+};
+
+Snack* tail =(Snack*)malloc(sizeof(Snack));
+Snack* head=(Snack*)malloc(sizeof(Snack));
+Snack* head_two=head;
+
+//函数声明
+void prompt_message();
+Snack* The_snake_body();//构造蛇体
+void food();//构造食物
+void Snack_exercise( char Input_char2);//蛇体运动
+void printf_map();//打印地图
+//-------------------------------------------
+void password_authentification()//输入帐号密码。输入正确进入游戏提示界
+{
+	
+	while(1)
+	{
+		int accouts_number,password;
+	
+// 		printf("请输入帐号:");
+// 		scanf("%d",&accouts_number);
+// 		printf("请输入密码:");
+// 		scanf("%d",&password);
+		accouts_number=123;
+		password=321;
+		if (accouts_number==123&&password==321)//如果帐号密码输入正确
+		{
+			system("cls");
+			prompt_message();//调用函数，输出提示信息
+			break;
+		}else//输入帐号密码错误
+		{
+			if (Wrong_number!=2)
+				printf("密码错误，请再次输入(你还有%d次机会)\n",2-Wrong_number);//提示输入错误
+			Wrong_number+=1;//错误次数+1
+			if (Wrong_number==3)//如果错误次数等于3关闭程序
+			{
+				printf("错误次数过多，已退出程序\n");
+				exit (0);//退出函数
+			}
+		}
+		
+	}
+}
+
+
+
+
+//-------------------------------------------
+void prompt_message()//游戏说明，并播放音乐
+{
+	char c;
+//	PlaySound(TEXT("E:\\KuGou\\田佑乐一 - 贪吃蛇（LIVE）.wav"),NULL,SND_SYNC || SND_LOOP);//播放本地音乐
+	printf("\t\t欢迎来到游戏世界\n\n");
+	printf("\t\t  空格开始游戏\n\n");
+	printf("\t\t w,a,s,d控制方向\n\n");
+	printf("\t\t  祝你游戏愉快\n\n");
+	
+	while(1)
+	{
+		//c=getch();
+		c=' ';
+		if (c==' ')
+		{
+			system("cls");
+			The_snake_body();
+			break;
+		}
+
+	}	
+
+
+}
+
+//-------------------------------------------
+Snack* The_snake_body()//蛇体
+{
+	tail=NULL;
+	srand((unsigned)time(NULL));//播下种子
+	int y=rand()%16+2;//随机值并确定范围
+	int x=rand()%42+2;//随机值并确定范围
+	head->x=x;//传值
+	head->y=y;//传值
+	head->next=tail;
+	Snack* f=head;
+	for(int i=0;i<length;i++)
+	{
+		Snack* body =(Snack*)malloc(sizeof(Snack));
+		body->x=f->x+1;
+		body->y=f->y;
+		f->next=body;
+		f=body;
+		f->next=tail;
+	}
+	Snack* r=head;
+	while (r)//为蛇体赋值
+	{
+		if (r == 0)
+		{
+			break;
+		}
+		map[r->y][r->x]= '*' ;
+		r=r->next;
+	}
+	return head;
+	
+}
+void food()
+{
+	int y,x;
+	do 
+	{
+		srand((unsigned)time(NULL));
+		y=rand()%15+2;
+		x=rand()%42+2;
+	} while (map[y][x]=='*');
+	map[y][x]='@';
+}
+
+
+
+ void Snack_exercise( char Input_char2)//蛇体运动函数
+ {
+	 char motor_direction=NULL;//记录上次运动方向
+	 char c=Input_char2;//读取用户输入的函数
+	if (c == 'w' || c=='W') 
+	{
+		
+		Snack*  head_2=(Snack*)malloc(sizeof(Snack));//申请一个链表座位蛇头
+		head_2->next=head_two;//头插入
+		Snack* g=head_2;//获取蛇身链表
+		int x=head_two->x,y=head_two->y;
+		while (g)								//循环判断，链表结尾
+		{
+			if (!g->next)					//蛇尾值空
+			{
+				map[g->y][g->x]=' ';			//蛇尾在地图上取消掉
+				g=NULL;
+				free(g);
+				
+				break;
+			}
+			g=g->next;
+		}
+		head_2->x=x;
+		head_2->y=y-1;
+		map[head_2->y][head_2->x]='*';
+		x=head_2->x;
+		y=head_2->y;
+		motor_direction='W';
+		head_two=head_2;//改变链表头
+	}else if ( c == 'a')
+	{
+
+	}else if( c == 's')
+	{
+
+	}else if(c == 'd')
+	{
+
+	}
+}
+
+ void printf_map()
+ {
+	 system("cls");
+	 for (int y=0;y<Y;y++)
+	 {
+		 printf("%s",map[y]);
+	 }
+
+ }
+int main()
+{
+	char Input_char;
+	SetWindowPos(FindWindowA(NULL,"C:\\Windows\\system32\\cmd.exe"),HWND_TOP,300,100,740,600,SWP_NOACTIVATE);//控制窗口位置，及其大小
+	password_authentification();
+ 	food();
+	printf_map();
+	while (1)
+	{
+		if (kbhit())
+		{
+			Input_char=getch();
+			Snack_exercise(Input_char);
+			printf_map();
+		}
+	}
+	
+
+	return 0;
+}
